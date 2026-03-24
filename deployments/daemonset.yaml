@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: virtio-device-plugin
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: virtio-device-plugin
+  template:
+    metadata:
+      labels:
+        app: virtio-device-plugin
+    spec:
+      serviceAccountName: default
+      containers:
+        - name: virtio-dp
+          image: ghcr.io/k8snetworkplumbingwg/virtio-device-plugin:latest
+          args:
+            - "--config-file=/etc/virtiodp/config.json"
+          # Privileged is required to create directories on host paths
+          # and to run setfacl for virtio socket permissions.
+          # TODO: evaluate reducing to specific capabilities.
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: device-plugins
+              mountPath: /var/lib/kubelet/device-plugins
+            - name: config
+              mountPath: /etc/virtiodp
+            - name: vhost-sockets
+              mountPath: /var/run/virtio-dp/
+            - name: devinfo
+              mountPath: /var/run/k8s.cni.cncf.io/devinfo
+            - name: sys
+              mountPath: /sys
+              readOnly: true
+      volumes:
+        - name: device-plugins
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+        - name: config
+          configMap:
+            name: virtio-dp-config
+        - name: vhost-sockets
+          hostPath:
+            path: /var/run/virtio-dp/
+            type: DirectoryOrCreate
+        - name: devinfo
+          hostPath:
+            path: /var/run/k8s.cni.cncf.io/devinfo
+            type: DirectoryOrCreate
+        - name: sys
+          hostPath:
+            path: /sys
