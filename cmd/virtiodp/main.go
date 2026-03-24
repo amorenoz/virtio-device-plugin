@@ -9,6 +9,7 @@ import (
 
 	"github.com/k8snetworkplumbingwg/virtio-device-plugin/pkg/config"
 	"github.com/k8snetworkplumbingwg/virtio-device-plugin/pkg/plugin"
+	"github.com/k8snetworkplumbingwg/virtio-device-plugin/pkg/vhost"
 )
 
 func main() {
@@ -45,9 +46,8 @@ func startServers(cfg *config.PluginConfig) []*plugin.Server {
 	var servers []*plugin.Server
 
 	for _, rc := range cfg.ResourceList {
-		// FIXME: Replace with actual resource pool.
-		pool := plugin.StubResourcePool{}
-		srv := plugin.NewServer(&pool)
+		pool := vhost.NewVhostUserResourcePool(cfg, &rc)
+		srv := plugin.NewServer(pool)
 
 		if err := srv.Start(); err != nil {
 			slog.Error("failed to start server", "resource", rc.ResourceName, "error", err)
