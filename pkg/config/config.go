@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -62,6 +63,12 @@ func Load(path string) (*PluginConfig, error) {
 	if err := validate(cfg); err != nil {
 		return nil, fmt.Errorf("invalid config: %w", err)
 	}
+
+	slog.Info("config loaded",
+		"path", path,
+		"resourcePrefix", cfg.ResourcePrefix,
+		"resourceCount", len(cfg.ResourceList),
+	)
 
 	return cfg, nil
 }

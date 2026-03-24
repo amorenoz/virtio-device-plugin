@@ -3,6 +3,7 @@ package topology
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -24,6 +25,7 @@ func NUMANodeForPCI(sysfsBase, pciAddr string) (int, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
+			slog.Debug("numa_node file not found, no NUMA affinity", "pciAddress", pciAddr)
 			return -1, nil
 		}
 		return -1, fmt.Errorf("reading %s: %w", path, err)
@@ -35,8 +37,10 @@ func NUMANodeForPCI(sysfsBase, pciAddr string) (int, error) {
 	}
 
 	if val < 0 {
+		slog.Debug("kernel reports no NUMA affinity", "pciAddress", pciAddr)
 		return -1, nil
 	}
 
+	slog.Debug("resolved NUMA node", "pciAddress", pciAddr, "numaNode", val)
 	return val, nil
 }
