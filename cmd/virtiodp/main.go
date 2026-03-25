@@ -4,8 +4,11 @@ import (
 	"flag"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/k8snetworkplumbingwg/virtio-device-plugin/pkg/config"
+	"github.com/k8snetworkplumbingwg/virtio-device-plugin/pkg/plugin"
 )
 
 func main() {
@@ -22,15 +25,39 @@ func main() {
 		os.Exit(1)
 	}
 
-	for _, rc := range cfg.ResourceList {
-		slog.Info("resource configured",
-			"resource", config.FullResourceName(cfg, &rc),
-			"numDevices", rc.NumDevices,
-			"baseDir", rc.BaseDir,
-		)
+	servers := startServers(cfg)
+	if len(servers) == 0 {
+		slog.Error("no servers started")
+		os.Exit(1)
 	}
 
-	// TODO: start plugin servers, watch kubelet socket, handle signals
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
+	s := <-sig
+	slog.Info("received signal, shutting down", "signal", s)
+
+	for _, srv := range servers {
+		srv.Stop()
+	}
+}
+
+func startServers(cfg *config.PluginConfig) []*plugin.Server {
+	var servers []*plugin.Server
+
+	for _, rc := range cfg.ResourceList {
+		// FIXME: Replace with actual resource pool.
+		pool := plugin.StubResourcePool{}
+		srv := plugin.NewServer(&pool)
+
+		if err := srv.Start(); err != nil {
+			slog.Error("failed to start server", "resource", rc.ResourceName, "error", err)
+			continue
+		}
+
+		servers = append(servers, srv)
+	}
+
+	return servers
 }
 
 func setupLogger(level, format string) {
