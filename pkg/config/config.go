@@ -22,7 +22,6 @@ const (
 type PluginConfig struct {
 	ResourceNamePrefix string           `json:"resourceNamePrefix,omitempty"`
 	ResourcePrefix     string           `json:"resourcePrefix"`
-	SocketUser         string           `json:"socketUser,omitempty"`
 	ResourceList       []ResourceConfig `json:"resourceList"`
 }
 
@@ -42,9 +41,6 @@ type TopologyHint struct {
 
 // BDF PCI address: dddd:BB:DD.f
 var pciAddrRegexp = regexp.MustCompile(`^[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-7]$`)
-
-// Unix username: alphanumeric, hyphen, underscore, 1-32 chars, must start with letter or underscore.
-var unixUserRegexp = regexp.MustCompile(`^[a-z_][a-z0-9_-]{0,31}$`)
 
 // Load reads the config file, unmarshals it, applies defaults, and validates.
 func Load(path string) (*PluginConfig, error) {
@@ -85,10 +81,6 @@ func validate(cfg *PluginConfig) error {
 	}
 	if errs := validation.IsDNS1123Subdomain(cfg.ResourcePrefix); len(errs) > 0 {
 		return fmt.Errorf("resourcePrefix %q is not a valid DNS subdomain: %s", cfg.ResourcePrefix, strings.Join(errs, "; "))
-	}
-
-	if cfg.SocketUser != "" && !unixUserRegexp.MatchString(cfg.SocketUser) {
-		return fmt.Errorf("socketUser %q is not a valid Unix username", cfg.SocketUser)
 	}
 
 	if len(cfg.ResourceList) == 0 {

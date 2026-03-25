@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,7 +20,6 @@ func writeConfigFile(t *testing.T, content string) string {
 func TestLoadValidConfig(t *testing.T) {
 	path := writeConfigFile(t, `{
 		"resourcePrefix": "openshift.io",
-		"socketUser": "openvswitch",
 		"resourceList": [
 			{
 				"resourceName": "vhost-phy0",
@@ -88,62 +86,6 @@ func TestFullResourceName(t *testing.T) {
 	if got != want {
 		t.Errorf("FullResourceName() = %q, want %q", got, want)
 	}
-}
-
-func TestSocketUserValidation(t *testing.T) {
-	base := `{"resourcePrefix": "example.com", "resourceList": [{"resourceName": "x1", "numDevices": 1, "baseDir": "/tmp"}], "socketUser": %q}`
-
-	t.Run("valid user", func(t *testing.T) {
-		path := writeConfigFile(t, fmt.Sprintf(base, "openvswitch"))
-		cfg, err := Load(path)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if cfg.SocketUser != "openvswitch" {
-			t.Errorf("expected %q, got %q", "openvswitch", cfg.SocketUser)
-		}
-	})
-
-	t.Run("valid user with underscore and hyphen", func(t *testing.T) {
-		path := writeConfigFile(t, fmt.Sprintf(base, "_ovs-user"))
-		if _, err := Load(path); err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-	})
-
-	t.Run("empty is allowed (no setfacl)", func(t *testing.T) {
-		noUser := `{"resourcePrefix": "example.com", "resourceList": [{"resourceName": "x1", "numDevices": 1, "baseDir": "/tmp"}]}`
-		path := writeConfigFile(t, noUser)
-		cfg, err := Load(path)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if cfg.SocketUser != "" {
-			t.Errorf("expected empty, got %q", cfg.SocketUser)
-		}
-	})
-
-	t.Run("invalid starts with hyphen", func(t *testing.T) {
-		path := writeConfigFile(t, fmt.Sprintf(base, "-bad"))
-		_, err := Load(path)
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
-		if !strings.Contains(err.Error(), "not a valid Unix username") {
-			t.Errorf("unexpected error: %v", err)
-		}
-	})
-
-	t.Run("invalid contains uppercase", func(t *testing.T) {
-		path := writeConfigFile(t, fmt.Sprintf(base, "BadUser"))
-		_, err := Load(path)
-		if err == nil {
-			t.Fatal("expected error, got nil")
-		}
-		if !strings.Contains(err.Error(), "not a valid Unix username") {
-			t.Errorf("unexpected error: %v", err)
-		}
-	})
 }
 
 func TestValidationErrors(t *testing.T) {
