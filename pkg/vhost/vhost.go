@@ -185,7 +185,7 @@ func (p *VhostUserResourcePool) resolveNUMANodes(rc *config.ResourceConfig) []*p
 }
 
 func (p *VhostUserResourcePool) socketFileDir(deviceID string) string {
-	return filepath.Join(p.baseDir, p.shortName, deviceID)
+	return filepath.Join(p.baseDir, fmt.Sprintf("%s_%s", p.shortName, deviceID))
 }
 
 func (p *VhostUserResourcePool) socketFilePath(deviceID string) string {

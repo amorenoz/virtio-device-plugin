@@ -13,7 +13,7 @@ data:
         {
           "resourceName": "vhost-phy0",
           "numDevices": 100,
-          "baseDir": "/var/run/virtio-dp/vhost-user/",
+          "baseDir": "/var/run/virtio-dp/",
           "topologyHintsFrom": [
             {
               "pciAddress": "0000:ab:cd.0"

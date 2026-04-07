@@ -74,7 +74,7 @@ func TestDevicePluginSingleDevice(t *testing.T) {
 		}).
 		Assess("device directory exists on host", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 			out, err := execOnKindNode(clusterName+"-control-plane",
-				"sh", "-c", fmt.Sprintf("find %s/vhost-net0/ -mindepth 1 -maxdepth 1 -type d", baseDir))
+				"sh", "-c", fmt.Sprintf("find %s/ -mindepth 1 -maxdepth 1 -type d -name 'vhost-net0*'", baseDir))
 			if err != nil {
 				t.Fatalf("listing device dir on host: %v (output: %s)", err, out)
 			}

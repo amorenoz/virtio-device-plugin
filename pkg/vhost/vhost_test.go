@@ -223,7 +223,7 @@ func TestBuildDevicesSkipsExistingDirectories(t *testing.T) {
 
 	// Pre-create directories for devices 1 and 3 to simulate in-use CNI allocations.
 	for _, id := range []string{"1", "3"} {
-		dir := filepath.Join(baseDir, "net0", id)
+		dir := filepath.Join(baseDir, fmt.Sprintf("net0_%s", id))
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			t.Fatal(err)
 		}
@@ -260,7 +260,7 @@ func TestAllocateReturnsMountPath(t *testing.T) {
 		t.Fatalf("Allocate() error: %v", err)
 	}
 
-	dir := filepath.Join(baseDir, "net0", "0")
+	dir := filepath.Join(baseDir, "net0_0")
 	mounts := alloc.Mounts()
 	if len(mounts) != 1 {
 		t.Fatalf("expected 1 mount, got %d", len(mounts))
@@ -324,7 +324,7 @@ func TestAllocateWritesDevInfo(t *testing.T) {
 		t.Errorf("devinfo Mode = %q, want %q", devInfo.VhostUser.Mode, vhostUserMode)
 	}
 
-	expectedPath := filepath.Join(baseDir, "net0", "3", socketFileName)
+	expectedPath := filepath.Join(baseDir, "net0_3", socketFileName)
 	if devInfo.VhostUser.Path != expectedPath {
 		t.Errorf("devinfo Path = %q, want %q", devInfo.VhostUser.Path, expectedPath)
 	}
@@ -369,7 +369,7 @@ func TestMultipleDeviceIDs(t *testing.T) {
 			t.Fatalf("Allocate(%s) error: %v", id, err)
 		}
 
-		expectedDir := filepath.Join(baseDir, "net0", id)
+		expectedDir := filepath.Join(baseDir, fmt.Sprintf("net0_%s", id))
 		mounts := alloc.Mounts()
 		if len(mounts) != 1 || mounts[0].HostPath != expectedDir {
 			t.Errorf("device %s: mount HostPath = %q, want %q", id, mounts[0].HostPath, expectedDir)
