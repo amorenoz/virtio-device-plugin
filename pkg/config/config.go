@@ -26,15 +26,15 @@ type PluginConfig struct {
 
 // ResourceConfig describes a single vhost-user resource pool.
 type ResourceConfig struct {
-	ResourceName      string         `json:"resourceName"`
-	NumDevices        int            `json:"numDevices"`
-	BaseDir           string         `json:"baseDir"`
-	TopologyHintsFrom []TopologyHint `json:"topologyHintsFrom,omitempty"`
+	ResourceName string        `json:"resourceName"`
+	NumDevices   int           `json:"numDevices"`
+	BaseDir      string        `json:"baseDir"`
+	TopologyFrom []TopologyDev `json:"topologyFrom,omitempty"`
 }
 
-// TopologyHint references a PCI device whose NUMA topology is inherited by
+// TopologyDev references a PCI device whose NUMA topology is inherited by
 // all devices in the resource pool.
-type TopologyHint struct {
+type TopologyDev struct {
 	PCIAddress string `json:"pciAddress"`
 }
 
@@ -120,9 +120,9 @@ func validateResource(rc ResourceConfig) error {
 		return fmt.Errorf("baseDir %q must be an absolute path", rc.BaseDir)
 	}
 
-	for j, th := range rc.TopologyHintsFrom {
+	for j, th := range rc.TopologyFrom {
 		if !pciAddrRegexp.MatchString(th.PCIAddress) {
-			return fmt.Errorf("topologyHintsFrom[%d]: invalid PCI address %q (expected dddd:BB:DD.f)", j, th.PCIAddress)
+			return fmt.Errorf("topologyFrom[%d]: invalid PCI address %q (expected dddd:BB:DD.f)", j, th.PCIAddress)
 		}
 	}
 

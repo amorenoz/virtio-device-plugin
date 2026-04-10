@@ -135,7 +135,7 @@ func TestValidationErrors(t *testing.T) {
 		},
 		{
 			name:    "invalid PCI address",
-			config:  `{"resourcePrefix": "example.com", "resourceList": [{"resourceName": "x1", "numDevices": 1, "baseDir": "/tmp", "topologyHintsFrom": [{"pciAddress": "bad"}]}]}`,
+			config:  `{"resourcePrefix": "example.com", "resourceList": [{"resourceName": "x1", "numDevices": 1, "baseDir": "/tmp", "topologyFrom": [{"pciAddress": "bad"}]}]}`,
 			wantErr: "invalid PCI address",
 		},
 		{
@@ -170,7 +170,7 @@ func TestLoadWithTopologyHints(t *testing.T) {
 				"resourceName": "vhost-phy0",
 				"numDevices": 50,
 				"baseDir": "/var/run/vhost/",
-				"topologyHintsFrom": [
+				"topologyFrom": [
 					{"pciAddress": "0000:ab:cd.0"},
 					{"pciAddress": "0000:12:34.7"}
 				]
@@ -184,11 +184,11 @@ func TestLoadWithTopologyHints(t *testing.T) {
 	}
 
 	rc := cfg.ResourceList[0]
-	if len(rc.TopologyHintsFrom) != 2 {
-		t.Fatalf("expected 2 topology hints, got %d", len(rc.TopologyHintsFrom))
+	if len(rc.TopologyFrom) != 2 {
+		t.Fatalf("expected 2 topology hints, got %d", len(rc.TopologyFrom))
 	}
-	if rc.TopologyHintsFrom[0].PCIAddress != "0000:ab:cd.0" {
-		t.Errorf("unexpected PCI address: %s", rc.TopologyHintsFrom[0].PCIAddress)
+	if rc.TopologyFrom[0].PCIAddress != "0000:ab:cd.0" {
+		t.Errorf("unexpected PCI address: %s", rc.TopologyFrom[0].PCIAddress)
 	}
 }
 
