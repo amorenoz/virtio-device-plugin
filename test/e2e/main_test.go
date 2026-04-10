@@ -127,20 +127,6 @@ func deployDevicePlugin(ctx context.Context, cfg *envconf.Config) (context.Conte
 	return ctx, nil
 }
 
-func findProjectRoot() string {
-	dir, _ := os.Getwd()
-	for {
-		if _, err := os.Stat(dir + "/go.mod"); err == nil {
-			return dir
-		}
-		parent := dir[:len(dir)-len(dir[len(dir)-1:])]
-		if parent == dir {
-			return "."
-		}
-		dir = parent
-	}
-}
-
 func waitForDaemonSet(ctx context.Context, r *resources.Resources, namespace, name string, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 	for time.Now().Before(deadline) {
