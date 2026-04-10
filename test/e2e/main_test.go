@@ -66,8 +66,7 @@ func deployDevicePlugin(ctx context.Context, cfg *envconf.Config) (context.Conte
 		},
 		Data: map[string]string{
 			"config.json": fmt.Sprintf(`{
-				"resourceNamePrefix": "virtio",
-				"resourcePrefix": "test.io",
+				"resourcePrefix": "virtio.test.io",
 				"resourceList": [{
 					"resourceName": "vhost-net0",
 					"numDevices": %d,

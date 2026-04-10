@@ -19,7 +19,6 @@ func writeConfigFile(t *testing.T, content string) string {
 
 func TestLoadValidConfig(t *testing.T) {
 	path := writeConfigFile(t, `{
-		"resourcePrefix": "openshift.io",
 		"resourceList": [
 			{
 				"resourceName": "vhost-phy0",
@@ -34,11 +33,8 @@ func TestLoadValidConfig(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if cfg.ResourceNamePrefix != DefaultResourceNamePrefix {
-		t.Errorf("expected default resourceNamePrefix %q, got %q", DefaultResourceNamePrefix, cfg.ResourceNamePrefix)
-	}
-	if cfg.ResourcePrefix != "openshift.io" {
-		t.Errorf("expected resourcePrefix %q, got %q", "openshift.io", cfg.ResourcePrefix)
+	if cfg.ResourcePrefix != DefaultResourcePrefix {
+		t.Errorf("expected default resourcePrefix %q, got %q", DefaultResourcePrefix, cfg.ResourcePrefix)
 	}
 	if len(cfg.ResourceList) != 1 {
 		t.Fatalf("expected 1 resource, got %d", len(cfg.ResourceList))
@@ -54,8 +50,7 @@ func TestLoadValidConfig(t *testing.T) {
 
 func TestLoadCustomPrefix(t *testing.T) {
 	path := writeConfigFile(t, `{
-		"resourceNamePrefix": "dpdk",
-		"resourcePrefix": "example.com",
+		"resourcePrefix": "vhost-user.example.com",
 		"resourceList": [
 			{
 				"resourceName": "net0",
@@ -69,15 +64,14 @@ func TestLoadCustomPrefix(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if cfg.ResourceNamePrefix != "dpdk" {
-		t.Errorf("expected resourceNamePrefix %q, got %q", "dpdk", cfg.ResourceNamePrefix)
+	if cfg.ResourcePrefix != "vhost-user.example.com" {
+		t.Errorf("expected resourcePrefix %q, got %q", "dpdk", cfg.ResourcePrefix)
 	}
 }
 
 func TestFullResourceName(t *testing.T) {
 	cfg := &PluginConfig{
-		ResourceNamePrefix: "virtio",
-		ResourcePrefix:     "openshift.io",
+		ResourcePrefix: "virtio.openshift.io",
 	}
 	rc := &ResourceConfig{ResourceName: "vhost-phy0"}
 
@@ -94,11 +88,6 @@ func TestValidationErrors(t *testing.T) {
 		config  string
 		wantErr string
 	}{
-		{
-			name:    "missing resourcePrefix",
-			config:  `{"resourceList": [{"resourceName": "x1", "numDevices": 1, "baseDir": "/tmp"}]}`,
-			wantErr: "resourcePrefix is required",
-		},
 		{
 			name:    "invalid resourcePrefix",
 			config:  `{"resourcePrefix": "-bad", "resourceList": [{"resourceName": "x1", "numDevices": 1, "baseDir": "/tmp"}]}`,

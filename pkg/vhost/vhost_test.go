@@ -16,8 +16,7 @@ func newTestPool(t *testing.T, numDevices int) (*VhostUserResourcePool, *devinfo
 	store := devinfo.NewTestStore()
 
 	cfg := &config.PluginConfig{
-		ResourceNamePrefix: "virtio",
-		ResourcePrefix:     "example.com",
+		ResourcePrefix: "virtio.example.com",
 	}
 	rc := &config.ResourceConfig{
 		ResourceName: "net0",
@@ -106,8 +105,7 @@ func TestDevicesWithMultiNUMA(t *testing.T) {
 		pci("0000:cd:00.0", 1))
 
 	cfg := &config.PluginConfig{
-		ResourceNamePrefix: "virtio",
-		ResourcePrefix:     "example.com",
+		ResourcePrefix: "virtio.example.com",
 	}
 	rc := &config.ResourceConfig{
 		ResourceName: "net0",
@@ -148,8 +146,7 @@ func TestDevicesDedupNUMA(t *testing.T) {
 		pci("0000:cd:00.0", 0))
 
 	cfg := &config.PluginConfig{
-		ResourceNamePrefix: "virtio",
-		ResourcePrefix:     "example.com",
+		ResourcePrefix: "virtio.example.com",
 	}
 	rc := &config.ResourceConfig{
 		ResourceName: "net0",
@@ -183,8 +180,7 @@ func TestDevicesWithMissingNUMAConfig(t *testing.T) {
 		pci("0000:cd:00.0"))
 
 	cfg := &config.PluginConfig{
-		ResourceNamePrefix: "virtio",
-		ResourcePrefix:     "example.com",
+		ResourcePrefix: "virtio.example.com",
 	}
 	rc := &config.ResourceConfig{
 		ResourceName: "net0",
@@ -212,8 +208,7 @@ func TestBuildDevicesSkipsExistingDirectories(t *testing.T) {
 	baseDir := t.TempDir()
 
 	cfg := &config.PluginConfig{
-		ResourceNamePrefix: "virtio",
-		ResourcePrefix:     "example.com",
+		ResourcePrefix: "virtio.example.com",
 	}
 	rc := &config.ResourceConfig{
 		ResourceName: "net0",

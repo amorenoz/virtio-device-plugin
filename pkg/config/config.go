@@ -13,16 +13,15 @@ import (
 )
 
 const (
-	DefaultResourceNamePrefix = "virtio"
-	DefaultConfigFile         = "/etc/virtiodp/config.json"
-	MaxDevicesPerResource     = 10000
+	DefaultResourcePrefix = "virtio.k8s.io"
+	DefaultConfigFile     = "/etc/virtiodp/config.json"
+	MaxDevicesPerResource = 10000
 )
 
 // PluginConfig is the top-level configuration read from the ConfigMap.
 type PluginConfig struct {
-	ResourceNamePrefix string           `json:"resourceNamePrefix,omitempty"`
-	ResourcePrefix     string           `json:"resourcePrefix"`
-	ResourceList       []ResourceConfig `json:"resourceList"`
+	ResourcePrefix string           `json:"resourcePrefix,omitempty"`
+	ResourceList   []ResourceConfig `json:"resourceList"`
 }
 
 // ResourceConfig describes a single vhost-user resource pool.
@@ -70,15 +69,12 @@ func Load(path string) (*PluginConfig, error) {
 }
 
 func applyDefaults(cfg *PluginConfig) {
-	if cfg.ResourceNamePrefix == "" {
-		cfg.ResourceNamePrefix = DefaultResourceNamePrefix
+	if cfg.ResourcePrefix == "" {
+		cfg.ResourcePrefix = DefaultResourcePrefix
 	}
 }
 
 func validate(cfg *PluginConfig) error {
-	if cfg.ResourcePrefix == "" {
-		return fmt.Errorf("resourcePrefix is required")
-	}
 	if errs := validation.IsDNS1123Subdomain(cfg.ResourcePrefix); len(errs) > 0 {
 		return fmt.Errorf("resourcePrefix %q is not a valid DNS subdomain: %s", cfg.ResourcePrefix, strings.Join(errs, "; "))
 	}
@@ -136,5 +132,5 @@ func validateResource(rc ResourceConfig) error {
 // FullResourceName returns the fully qualified k8s extended resource name,
 // e.g. "virtio.openshift.io/vhost-phy0".
 func FullResourceName(cfg *PluginConfig, rc *ResourceConfig) string {
-	return cfg.ResourceNamePrefix + "." + cfg.ResourcePrefix + "/" + rc.ResourceName
+	return cfg.ResourcePrefix + "/" + rc.ResourceName
 }
