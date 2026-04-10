@@ -168,7 +168,7 @@ func (p *VhostUserResourcePool) resolveNUMANodes(rc *config.ResourceConfig) []*p
 	seen := make(map[int]bool)
 	var nodes []*pluginapi.NUMANode
 
-	for _, th := range rc.TopologyHintsFrom {
+	for _, th := range rc.TopologyFrom {
 		node, err := topology.NUMANodeForPCI(p.sysfsBase, th.PCIAddress)
 		if err != nil {
 			p.logger.Warn("failed to resolve NUMA node", "pciAddress", th.PCIAddress, "error", err)

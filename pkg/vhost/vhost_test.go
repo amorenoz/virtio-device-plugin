@@ -111,7 +111,7 @@ func TestDevicesWithMultiNUMA(t *testing.T) {
 		ResourceName: "net0",
 		NumDevices:   3,
 		BaseDir:      baseDir,
-		TopologyHintsFrom: []config.TopologyHint{
+		TopologyFrom: []config.TopologyDev{
 			{PCIAddress: "0000:ab:00.0"},
 			{PCIAddress: "0000:cd:00.0"},
 		},
@@ -152,7 +152,7 @@ func TestDevicesDedupNUMA(t *testing.T) {
 		ResourceName: "net0",
 		NumDevices:   2,
 		BaseDir:      baseDir,
-		TopologyHintsFrom: []config.TopologyHint{
+		TopologyFrom: []config.TopologyDev{
 			{PCIAddress: "0000:ab:00.0"},
 			{PCIAddress: "0000:cd:00.0"},
 		},
@@ -186,7 +186,7 @@ func TestDevicesWithMissingNUMAConfig(t *testing.T) {
 		ResourceName: "net0",
 		NumDevices:   2,
 		BaseDir:      baseDir,
-		TopologyHintsFrom: []config.TopologyHint{
+		TopologyFrom: []config.TopologyDev{
 			{PCIAddress: "0000:ab:00.0"},
 			{PCIAddress: "0000:cd:00.0"},
 		},
